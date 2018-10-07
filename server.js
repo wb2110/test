@@ -2,21 +2,28 @@ var http=require('http');
 var httpProxy = require('http-proxy');
 const url = require('url')
 var net=require('net');
+var express=require('express');
 
 var proxy = httpProxy.createProxyServer();
-
-
-var server=http.createServer(function(req,res){
+var app = express();
+app.get('/',function(req,res){
+    res.write("<h1>呵呵</h1>")
+})
+app.use(function(req,res){
 	console.log(req.url);
 	var option=url.parse(req.url);
 	let host=option.protocol+`//`+option.host+ (option.port==null?"":":"+option.port);
-	
-	
-	proxy.web(req, res, {
+    
+    proxy.web(req, res, {
      target: host
 		});
-	
-}).listen(8088);
+})
+
+
+var server=http.createServer(app).listen(8088);
+
+
+
 proxy.on('error',function(err){console.log('proxy error:',err)});
 
 server.on('upgrade',function(req,res){
